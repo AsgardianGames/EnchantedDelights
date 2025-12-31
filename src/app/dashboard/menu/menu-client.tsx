@@ -1,6 +1,39 @@
 import { createClient } from "@/utils/supabase/client"
+import { useState } from "react"
+import { Button } from "@/components/ui/button"
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table"
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { Switch } from "@/components/ui/switch"
+import { formatCurrency } from "@/lib/utils"
+import { Plus, Pencil } from "lucide-react"
+import { upsertProduct, toggleProductStatus } from "./actions"
+import { toast } from "sonner"
 
-// ... imports remain the same ...
+type Product = {
+    id: string
+    name: string
+    description: string | null
+    price: number
+    image_url: string | null
+    is_active: boolean
+}
 
 export function MenuManager({ initialProducts }: { initialProducts: Product[] }) {
     const [isDialogOpen, setIsDialogOpen] = useState(false)
