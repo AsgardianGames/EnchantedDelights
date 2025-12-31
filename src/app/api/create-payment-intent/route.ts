@@ -44,25 +44,24 @@ export async function POST(req: Request) {
     }
 
     // Apply Tax (8.2%)
+    // Apply Tax (8.2%)
     const tax = total * 0.082
-    total = Math.round((total + tax) * 100) / 100 // Round to 2 decimals
+    // precise total in cents (integer)
+    const finalTotal = Math.round(total + tax)
 
-    if (total < 50) { // Limit min order
+    if (finalTotal < 50) { // Limit min order ($0.50)
         return new NextResponse("Minimum order amount is $0.50", { status: 400 })
     }
 
     // Create Order in DB (Status: Pending Payment)
     const { data: { user } } = await supabase.auth.getUser()
 
-    // We create the order record FIRST to get an ID, or we pass metadata to Stripe and create via Webhook?
-    // Safer: Create "pending" order now.
-
     let orderId = null
 
     if (user) {
         const { data: order, error: orderError } = await supabase.from('orders').insert({
             customer_id: user.id,
-            total_amount: Math.round(total * 100), // Store in Cents
+            total_amount: finalTotal, // Store in Cents
             status: 'pending',
             pickup_date: pickupDate || new Date().toISOString(),
         }).select().single()
@@ -90,7 +89,7 @@ export async function POST(req: Request) {
     }
 
     const paymentIntent = await stripe.paymentIntents.create({
-        amount: Math.round(total * 100),
+        amount: finalTotal,
         currency: 'usd',
         metadata: {
             orderId: orderId || 'guest_order',
