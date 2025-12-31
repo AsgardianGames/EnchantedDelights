@@ -105,7 +105,7 @@ export default async function ProfilePage() {
                                             ${order.status === 'paid' ? 'bg-green-100 text-green-800' :
                                                         order.status === 'ready' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'}
                                         `}>
-                                                    {order.status}
+                                                    {order.status.replace('_', ' ')}
                                                 </span>
                                                 <p className="font-bold mt-1">{formatCurrency(order.total_amount)}</p>
                                             </div>

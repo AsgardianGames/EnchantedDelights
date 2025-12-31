@@ -80,8 +80,8 @@ export function KitchenBoard({ initialOrders }: { initialOrders: Order[] }) {
                     {actionLabel}
                 </Button>
 
-                {/* Cancel Button only for 'To Bake' column */}
-                {(order.status === 'paid' || order.status === 'pending') && (
+                {/* Cancel Button for all active columns */}
+                {(order.status === 'paid' || order.status === 'pending' || order.status === 'baking' || order.status === 'ready') && (
                     <Button
                         onClick={(e) => {
                             e.stopPropagation()
