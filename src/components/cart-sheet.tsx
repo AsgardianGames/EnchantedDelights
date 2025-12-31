@@ -7,6 +7,7 @@ import {
     SheetTitle,
     SheetTrigger,
     SheetFooter,
+    SheetClose
 } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
 import { useCartStore } from "@/store/cart-store"
@@ -67,9 +68,11 @@ export function CartSheet() {
                         <span>Total:</span>
                         <span>{formatCurrency(total)}</span>
                     </div>
-                    <Button asChild className="w-full bg-primary text-primary-foreground" disabled={items.length === 0}>
-                        <Link href="/checkout">Checkout</Link>
-                    </Button>
+                    <SheetClose asChild>
+                        <Button asChild className="w-full bg-primary text-primary-foreground" disabled={items.length === 0}>
+                            <Link href="/checkout">Checkout</Link>
+                        </Button>
+                    </SheetClose>
                 </SheetFooter>
             </SheetContent>
         </Sheet>
