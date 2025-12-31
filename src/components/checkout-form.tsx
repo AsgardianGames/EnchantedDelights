@@ -25,22 +25,16 @@ export function CheckoutForm({ clientSecret, pickupDate }: { clientSecret: strin
 
         setIsLoading(true)
 
-        try {
-            // Fake Payment API Call
-            const res = await fetch("/api/simulate-payment", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ items, pickupDate }),
-            })
+        const { error } = await stripe.confirmPayment({
+            elements,
+            confirmParams: {
+                return_url: `${window.location.origin}/profile`, // Redirect to profile upon completion
+            },
+        })
 
-            if (!res.ok) throw new Error(await res.text())
-
-            clearCart()
-            toast.success("Payment Successful! Your order has been placed.")
-            window.location.href = "/profile" // Redirect to Profile instead of Dashboard
-        } catch (error) {
-            setErrorMessage((error as Error).message || "An unexpected error occurred.")
-            toast.error("Payment Failed")
+        if (error) {
+            setErrorMessage(error.message || "An unexpected error occurred.")
+            toast.error(error.message)
             setIsLoading(false)
         }
     }
