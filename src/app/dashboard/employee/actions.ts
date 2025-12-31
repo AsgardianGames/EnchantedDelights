@@ -3,7 +3,7 @@
 import { createClient } from "@/utils/supabase/server"
 import { revalidatePath } from "next/cache"
 
-export async function updateOrderStatus(orderId: string, status: 'baking' | 'ready' | 'picked_up') {
+export async function updateOrderStatus(orderId: string, status: 'baking' | 'ready' | 'picked_up' | 'cancelled') {
     const supabase = await createClient()
 
     // Verify Staff Role
