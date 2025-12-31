@@ -69,7 +69,7 @@ export default async function KitchenDashboard() {
                 </TabsList>
 
                 <TabsContent value="active" className="space-y-4">
-                    <KitchenBoard initialOrders={activeOrders as any || []} />
+                    <KitchenBoard initialOrders={(activeOrders as any)?.filter((o: any) => o.order_items.length > 0) || []} />
                 </TabsContent>
 
                 <TabsContent value="history">

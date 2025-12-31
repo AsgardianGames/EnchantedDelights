@@ -62,7 +62,7 @@ export async function POST(req: Request) {
     if (user) {
         const { data: order, error: orderError } = await supabase.from('orders').insert({
             customer_id: user.id,
-            total_amount: total,
+            total_amount: Math.round(total * 100), // Store in Cents
             status: 'pending',
             pickup_date: pickupDate || new Date().toISOString(),
         }).select().single()
