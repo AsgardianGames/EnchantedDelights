@@ -5,10 +5,11 @@ import { loadStripe } from "@stripe/stripe-js"
 import { Elements } from "@stripe/react-stripe-js"
 import { useCartStore } from "@/store/cart-store"
 import { CheckoutForm } from "@/components/checkout-form"
-import { DatePicker } from "@/components/ui/date-picker"
+import { Calendar } from "@/components/ui/calendar"
 import { formatCurrency } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Loader2 } from "lucide-react"
+import { addDays, format } from "date-fns"
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
 
@@ -18,8 +19,8 @@ export default function CheckoutPage() {
     const { items, total } = useCartStore()
     const [isLoading, setIsLoading] = useState(false)
 
-    // Auto-redirect if empty? 
-    // For now just show empty message
+    // Minimum date is tomorrow
+    const tomorrow = addDays(new Date(), 1)
 
     const initializePayment = async () => {
         if (!pickupDate) return
@@ -52,49 +53,74 @@ export default function CheckoutPage() {
     }
 
     return (
-        <div className="min-h-screen container mx-auto px-4 py-12 max-w-2xl text-center md:text-left">
-            <h1 className="text-4xl font-serif text-primary mb-8 text-center">Checkout</h1>
+        <div className="min-h-screen container mx-auto px-4 py-12 max-w-4xl">
+            <h1 className="text-4xl font-serif text-primary mb-12 text-center">Checkout</h1>
 
-            <div className="space-y-8">
-                {/* Step 1: Review & Date */}
-                {!clientSecret && (
-                    <div className="bg-card border rounded-lg p-6 space-y-6">
-                        <h2 className="text-2xl font-serif">1. Choose Pickup Date</h2>
-                        <div className="flex flex-col gap-4">
-                            <p className="text-muted-foreground text-sm">
-                                Please select a pickup date. Note: We require 24 hours notice for all orders.
+            <div className="grid md:grid-cols-2 gap-12">
+                {/* Left Col: Date Selection */}
+                <div className="space-y-6">
+                    <div className="bg-card border rounded-xl p-8 shadow-sm flex flex-col items-center">
+                        <h2 className="text-xl font-serif mb-4">1. Choose Pickup Date</h2>
+                        <p className="text-muted-foreground text-sm mb-6 text-center">
+                            Orders require 24h notice.
+                        </p>
+
+                        <Calendar
+                            mode="single"
+                            selected={pickupDate}
+                            onSelect={setPickupDate}
+                            disabled={(date) => date < tomorrow}
+                            className="rounded-md border shadow p-4 bg-background"
+                        />
+
+                        {pickupDate && (
+                            <p className="mt-4 text-primary font-medium">
+                                Selected: {format(pickupDate, "PPP")}
                             </p>
-                            <div className="flex justify-center md:justify-start">
-                                <DatePicker date={pickupDate} setDate={setPickupDate} />
-                            </div>
-                        </div>
+                        )}
+                    </div>
+                </div>
 
-                        <div className="border-t pt-4">
-                            <div className="flex justify-between font-bold text-lg mb-6">
-                                <span>Total</span>
-                                <span>{formatCurrency(total)}</span>
-                            </div>
-                            <Button
-                                onClick={initializePayment}
-                                disabled={!pickupDate || isLoading}
-                                className="w-full bg-primary h-12 text-lg"
-                            >
-                                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                Continue to Payment
-                            </Button>
+                {/* Right Col: Summary & Payment */}
+                <div className="space-y-6">
+                    {/* Order Summary */}
+                    <div className="bg-card border rounded-xl p-8 shadow-sm">
+                        <h2 className="text-xl font-serif mb-6">Order Summary</h2>
+                        <div className="space-y-3 mb-6 max-h-60 overflow-y-auto pr-2">
+                            {items.map((item) => (
+                                <div key={item.id} className="flex justify-between text-sm">
+                                    <span>{item.quantity}x {item.name}</span>
+                                    <span className="font-medium">{formatCurrency(item.price * item.quantity)}</span>
+                                </div>
+                            ))}
+                        </div>
+                        <div className="border-t pt-4 flex justify-between font-bold text-lg">
+                            <span>Total</span>
+                            <span>{formatCurrency(total)}</span>
                         </div>
                     </div>
-                )}
 
-                {/* Step 2: Payment */}
-                {clientSecret && stripePromise && (
-                    <div className="bg-card border rounded-lg p-6">
-                        <h2 className="text-2xl font-serif mb-6">2. Payment Details</h2>
-                        <Elements stripe={stripePromise} options={{ clientSecret, appearance: { theme: 'night', variables: { colorPrimary: '#d4af37' } } }}>
-                            <CheckoutForm clientSecret={clientSecret} pickupDate={pickupDate!} />
-                        </Elements>
-                    </div>
-                )}
+                    {/* Step 2: Payment or Confirm Date Button */}
+                    {!clientSecret ? (
+                        <Button
+                            onClick={initializePayment}
+                            disabled={!pickupDate || isLoading}
+                            className="w-full h-14 text-lg rounded-xl shadow-lg transition-all hover:scale-[1.02]"
+                        >
+                            {isLoading && <Loader2 className="mr-2 h-5 w-5 animate-spin" />}
+                            Continue to Payment
+                        </Button>
+                    ) : (
+                        stripePromise && (
+                            <div className="bg-card border rounded-xl p-6 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                <h2 className="text-xl font-serif mb-6">2. Payment Details</h2>
+                                <Elements stripe={stripePromise} options={{ clientSecret, appearance: { theme: 'night', variables: { colorPrimary: '#d4af37' } } }}>
+                                    <CheckoutForm clientSecret={clientSecret} pickupDate={pickupDate!} />
+                                </Elements>
+                            </div>
+                        )
+                    )}
+                </div>
             </div>
         </div>
     )

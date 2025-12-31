@@ -1,30 +1,61 @@
+
 import Link from "next/link";
+import { createClient } from "@/utils/supabase/server";
+import { MenuGrid } from "@/components/menu-grid";
 
-export default function Home() {
+export const dynamic = 'force-dynamic'
+
+export default async function Home() {
+  const supabase = await createClient()
+
+  // Fetch Active Products for Menu
+  const { data: products } = await supabase
+    .from('products')
+    .select('*')
+    .eq('is_active', true)
+    .order('name')
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start text-center sm:text-left">
-        <h1 className="text-4xl font-bold tracking-tight">Enchanted Delights Bakery</h1>
-        <p className="text-lg text-muted-foreground max-w-xl">
-          Freshly baked artisan breads, customized cakes, and delightful pastries.
-          Order online for pickup in 24 hours.
-        </p>
+    <div className="min-h-screen font-[family-name:var(--font-geist-sans)]">
+      {/* Hero Section */}
+      <section className="relative h-[60vh] flex items-center justify-center bg-[#fdfbf7] dark:bg-black/20">
+        <div className="text-center space-y-6 px-4 max-w-3xl">
+          <h1 className="text-5xl sm:text-7xl font-bold font-serif tracking-tight text-[#3d2b1f] dark:text-[#d4af37]">
+            Enchanted Delights
+          </h1>
+          <p className="text-xl text-muted-foreground font-light">
+            Artisan pastries, breads, and cakes baked fresh daily.
+            <br className="hidden sm:block" /> Order online for pickup in 24 hours.
+          </p>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <Link
-            href="/dashboard/customer"
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-          >
-            Order Now
-          </Link>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="#menu"
-          >
-            View Menu
-          </a>
+          <div className="flex gap-4 justify-center pt-4">
+            <Link
+              href="#menu"
+              className="rounded-full bg-[#5c4033] text-white hover:bg-[#4a332a] h-12 px-8 flex items-center justify-center font-medium transition-colors"
+            >
+              View Menu
+            </Link>
+            <Link
+              href="/profile"
+              className="rounded-full border border-[#5c4033] text-[#5c4033] hover:bg-[#5c4033]/10 h-12 px-8 flex items-center justify-center font-medium transition-colors dark:border-[#d4af37] dark:text-[#d4af37]"
+            >
+              My Account
+            </Link>
+          </div>
         </div>
-      </main>
+      </section>
+
+      {/* Menu Section */}
+      <section className="py-20 px-4 sm:px-8 bg-white dark:bg-black/10">
+        <div className="container mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-serif text-primary font-bold mb-4">Our Menu</h2>
+            <div className="h-1 w-20 bg-primary mx-auto rounded-full"></div>
+          </div>
+
+          <MenuGrid products={products as any || []} />
+        </div>
+      </section>
     </div>
   );
 }
