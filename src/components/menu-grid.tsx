@@ -26,60 +26,61 @@ export function MenuGrid({ products }: { products: Product[] }) {
     }
 
     return (
-        <div id="menu" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-12">
+        <div id="menu" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-10">
             {products.map((product, idx) => (
-                <div key={product.id} className="group relative flex flex-col items-center text-center">
-                    {/* Image Container */}
-                    <div className="relative w-full aspect-square mb-6 overflow-hidden rounded-lg bg-muted/20">
+                <div key={product.id} className="group relative overflow-hidden rounded-xl shadow-lg border border-emerald-900/10">
+                    {/* Image Container & Overlay */}
+                    <div className="relative w-full aspect-square bg-emerald-950/5">
                         {product.image_url ? (
                             <Image
                                 src={product.image_url}
                                 alt={product.name}
                                 fill
-                                className="object-cover transform group-hover:scale-105 transition-transform duration-500"
+                                className="object-cover transition-transform duration-700 group-hover:scale-110"
                             />
                         ) : (
-                            <div className="w-full h-full flex items-center justify-center text-muted-foreground bg-secondary/30">
+                            <div className="w-full h-full flex items-center justify-center text-emerald-800/40 bg-emerald-900/5">
                                 No Image
                             </div>
                         )}
 
-                        {/* Badges (Mock Logic for demo) */}
+                        {/* Badges */}
                         {idx % 4 === 0 && (
-                            <Badge className="absolute top-4 left-4 bg-[#5c4033] hover:bg-[#4a332a] text-white border-0 rounded-full px-3">
+                            <Badge className="absolute top-4 left-4 bg-amber-500 text-black border-none font-bold shadow-md">
                                 Best Seller!
                             </Badge>
                         )}
                         {idx % 3 === 0 && idx % 4 !== 0 && (
-                            <Badge className="absolute top-4 right-4 bg-orange-600 hover:bg-orange-700 text-white border-0 rounded-full px-3">
+                            <Badge className="absolute top-4 right-4 bg-emerald-600 text-white border-none shadow-md">
                                 New!
                             </Badge>
                         )}
 
-                        {/* Add Button Overlay */}
-                        <div className="absolute bottom-4 right-4 sm:bottom-6 sm:right-6">
-                            <Button
-                                size="icon"
-                                className="h-10 w-10 sm:h-12 sm:w-12 rounded-full shadow-lg bg-[#5c4033] hover:bg-[#4a332a] text-white transition-transform hover:scale-110"
-                                onClick={() => handleAddToCart(product)}
-                            >
-                                <Plus className="h-6 w-6" />
-                            </Button>
-                        </div>
-                    </div>
+                        {/* Gradient Overlay & Content */}
+                        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-emerald-950/95 via-emerald-950/80 to-transparent pt-12 pb-4 px-4 translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+                            <div className="flex justify-between items-end">
+                                <div className="space-y-1 text-left">
+                                    <h3 className="font-serif text-xl font-bold tracking-wide text-[#f5e6d3] drop-shadow-sm">
+                                        {product.name}
+                                    </h3>
+                                    <p className="text-sm text-[#d4c5b0]/80 line-clamp-2 leading-snug max-w-[85%]">
+                                        {product.description || "Freshly baked goodness."}
+                                    </p>
+                                    <p className="text-lg font-bold text-amber-400 pt-1">
+                                        {formatCurrency(product.price)}
+                                        <span className="text-xs text-[#d4c5b0]/60 font-medium ml-1">/ each</span>
+                                    </p>
+                                </div>
 
-                    {/* Content */}
-                    <div className="space-y-2 max-w-[90%]">
-                        <h3 className="font-serif text-xl sm:text-2xl font-bold uppercase tracking-wide text-[#3d2b1f] dark:text-[#d4af37]">
-                            {product.name}
-                        </h3>
-                        <p className="text-muted-foreground text-sm line-clamp-2 min-h-[2.5rem]">
-                            {product.description || "Freshly baked goodness."}
-                        </p>
-                        <p className="text-lg font-medium text-primary pt-1">
-                            {formatCurrency(product.price)}
-                            <span className="text-xs text-muted-foreground font-normal ml-1">/ each</span>
-                        </p>
+                                <Button
+                                    size="icon"
+                                    className="h-10 w-10 shrink-0 rounded-full bg-amber-500 hover:bg-amber-400 text-emerald-950 shadow-lg mb-1"
+                                    onClick={() => handleAddToCart(product)}
+                                >
+                                    <Plus className="h-6 w-6" />
+                                </Button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             ))}
