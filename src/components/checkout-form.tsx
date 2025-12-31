@@ -45,7 +45,7 @@ export function CheckoutForm({ clientSecret, pickupDate }: { clientSecret: strin
             {errorMessage && <div className="text-red-500 text-sm">{errorMessage}</div>}
             <Button
                 disabled={!stripe || isLoading}
-                className="w-full bg-primary text-primary-foreground font-serif text-lg py-6"
+                className="w-full bg-amber-500 hover:bg-amber-400 text-black font-serif font-bold text-lg py-6 shadow-lg transition-transform hover:scale-[1.01]"
             >
                 {isLoading ? "Processing..." : "Pay Now"}
             </Button>

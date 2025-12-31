@@ -140,7 +140,7 @@ export default function CheckoutPage() {
                         <Button
                             onClick={initializePayment}
                             disabled={!pickupDate || isLoading}
-                            className="w-full h-14 text-lg rounded-xl shadow-lg transition-all hover:scale-[1.02]"
+                            className="w-full h-14 text-lg rounded-xl shadow-lg transition-all hover:scale-[1.02] bg-emerald-700 hover:bg-emerald-800 text-white border-2 border-emerald-600"
                         >
                             {isLoading && <Loader2 className="mr-2 h-5 w-5 animate-spin" />}
                             Continue to Payment
