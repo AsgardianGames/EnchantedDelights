@@ -66,15 +66,16 @@ export function KitchenBoard({ initialOrders }: { initialOrders: Order[] }) {
                         <p className="text-[10px] text-muted-foreground uppercase tracking-widest">#{order.id.slice(0, 6)}</p>
                     </div>
                     <Badge variant="outline" className="border-primary/40 text-primary">
-                        {format(new Date(order.pickup_date), 'h:mm a')}
+                        {format(new Date(order.pickup_date), 'MMM do')}
                     </Badge>
                 </div>
             </CardHeader>
             <CardContent className="p-4 pt-2 space-y-4">
                 <div className="text-sm space-y-1 bg-background/40 p-2 rounded-md border border-primary/10">
+                    {order.order_items.length === 0 && <p className="text-xs text-muted-foreground italic">No items found</p>}
                     {order.order_items.map((item, i) => (
                         <div key={i} className="flex justify-between items-center">
-                            <span className="text-foreground/90">{item.products?.name}</span>
+                            <span className="text-foreground/90 font-serif tracking-wide">{item.products?.name || "Unknown Item"}</span>
                             <span className="font-bold text-primary">x{item.quantity}</span>
                         </div>
                     ))}

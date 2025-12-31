@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button"
 import { Loader2 } from "lucide-react"
 import { addDays, format } from "date-fns"
 import { createClient } from "@/utils/supabase/client"
+import { toast } from "sonner"
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
 
@@ -55,8 +56,10 @@ export default function CheckoutPage() {
 
             const data = await res.json()
             setClientSecret(data.clientSecret)
+            setClientSecret(data.clientSecret)
         } catch (error) {
             console.error(error)
+            toast.error((error as Error).message || "Something went wrong")
         } finally {
             setIsLoading(false)
         }
