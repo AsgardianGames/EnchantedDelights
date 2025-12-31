@@ -129,10 +129,12 @@ export default async function OwnerDashboard() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {recentOrders?.map((order) => (
+                            {recentOrders?.map((order: any) => (
                                 <TableRow key={order.id}>
                                     <TableCell>
-                                        <div className="font-medium">{order.profiles?.full_name || 'Guest'}</div>
+                                        <div className="font-medium">
+                                            {order.profiles?.full_name || order.profiles?.[0]?.full_name || 'Guest'}
+                                        </div>
                                         <div className="text-xs text-muted-foreground truncate w-24">#{order.id}</div>
                                     </TableCell>
                                     <TableCell>{format(new Date(order.created_at), 'MMM d, p')}</TableCell>
