@@ -66,7 +66,7 @@ export default async function ProfilePage() {
                                 </Button>
                                 {profile?.role === 'owner' && (
                                     <Button asChild className="w-full" variant="outline">
-                                        <Link href="/dashboard/owner">Financials</Link>
+                                        <Link href="/dashboard/owner">Bakery Settings</Link>
                                     </Button>
                                 )}
                             </div>
