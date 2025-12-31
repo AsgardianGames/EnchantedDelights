@@ -10,6 +10,7 @@ import { formatCurrency } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Loader2 } from "lucide-react"
 import { addDays, format } from "date-fns"
+import { createClient } from "@/utils/supabase/client"
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
 
@@ -18,6 +19,23 @@ export default function CheckoutPage() {
     const [pickupDate, setPickupDate] = useState<Date | undefined>()
     const { items, total } = useCartStore()
     const [isLoading, setIsLoading] = useState(false)
+    const [pickupDays, setPickupDays] = useState<number[]>([]) // Default empty until fetch
+    const [daysLoaded, setDaysLoaded] = useState(false)
+
+    // Fetch Allowed Pickup Days
+    useEffect(() => {
+        const fetchSettings = async () => {
+            const supabase = createClient()
+            const { data } = await supabase.from('store_settings').select('pickup_days').single()
+            if (data) {
+                setPickupDays(data.pickup_days || [0, 1, 2, 3, 4, 5, 6])
+            } else {
+                setPickupDays([0, 1, 2, 3, 4, 5, 6]) // Fallback all days
+            }
+            setDaysLoaded(true)
+        }
+        fetchSettings()
+    }, [])
 
     // Minimum date is tomorrow
     const tomorrow = addDays(new Date(), 1)
@@ -69,7 +87,11 @@ export default function CheckoutPage() {
                             mode="single"
                             selected={pickupDate}
                             onSelect={setPickupDate}
-                            disabled={(date) => date < tomorrow}
+                            disabled={(date) => {
+                                const isBeforeTomorrow = date < tomorrow
+                                const isDayAllowed = pickupDays.includes(date.getDay())
+                                return isBeforeTomorrow || !isDayAllowed
+                            }}
                             className="rounded-md border shadow p-4 bg-background"
                         />
 

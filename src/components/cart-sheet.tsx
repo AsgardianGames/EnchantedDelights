@@ -45,7 +45,7 @@ export function CartSheet() {
                     <SheetTitle className="font-serif text-2xl text-center">Your Cart</SheetTitle>
                 </SheetHeader>
 
-                <div className="flex-1 overflow-y-auto py-6 space-y-6">
+                <div className="flex-1 overflow-y-auto py-6 px-4 space-y-6">
                     {items.length === 0 ? (
                         <div className="h-full flex flex-col items-center justify-center text-muted-foreground space-y-4">
                             <ShoppingBasket className="h-12 w-12 opacity-20" />
@@ -101,7 +101,7 @@ export function CartSheet() {
                     )}
                 </div>
 
-                <SheetFooter className="border-t pt-6 sm:flex-col gap-4">
+                <SheetFooter className="border-t pt-6 sm:flex-col gap-4 px-4">
                     <div className="space-y-2">
                         <div className="flex justify-between text-base">
                             <span className="text-muted-foreground">Subtotal</span>

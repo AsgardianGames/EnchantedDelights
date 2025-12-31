@@ -4,6 +4,8 @@ import { redirect } from 'next/navigation'
 import { KitchenBoard } from './kitchen-board'
 import { OrderHistory } from './order-history'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Button } from "@/components/ui/button"
+import Link from 'next/link'
 
 export const dynamic = 'force-dynamic'
 
@@ -50,7 +52,14 @@ export default async function KitchenDashboard() {
 
     return (
         <div className="container mx-auto px-4 py-8">
-            <h1 className="text-3xl font-serif text-primary mb-8">Kitchen Dashboard</h1>
+            <div className="flex items-center justify-between mb-8">
+                <h1 className="text-3xl font-serif text-primary">Kitchen Dashboard</h1>
+                <Button asChild>
+                    <Link href="/dashboard/menu">
+                        Manage Menu
+                    </Link>
+                </Button>
+            </div>
 
             <Tabs defaultValue="active" className="space-y-4">
                 <TabsList>

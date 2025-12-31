@@ -36,15 +36,6 @@ export function Header() {
                         >
                             Menu
                         </Link>
-                        <Link
-                            href="/dashboard/menu"
-                            className={cn(
-                                "transition-colors hover:text-foreground/80 hidden sm:block", // Hide on mobile if too crowded, or keep.
-                                pathname === "/dashboard/menu" ? "text-foreground" : "text-foreground/60"
-                            )}
-                        >
-                            Manage Menu
-                        </Link>
                     </nav>
                 </div>
                 <div className="flex flex-1 items-center justify-end space-x-4">

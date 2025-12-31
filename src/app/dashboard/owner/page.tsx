@@ -13,6 +13,7 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
+import { SettingsForm } from "./settings-form"
 
 export const dynamic = 'force-dynamic'
 
@@ -60,6 +61,12 @@ export default async function OwnerDashboard() {
         `)
         .order('created_at', { ascending: false })
         .limit(5)
+
+    // 4. Fetch Store Settings
+    const { data: storeSettings } = await supabase
+        .from('store_settings')
+        .select('pickup_days')
+        .single()
 
     return (
         <div className="container mx-auto px-4 py-8">
@@ -158,6 +165,11 @@ export default async function OwnerDashboard() {
                         </TableBody>
                     </Table>
                 </div>
+            </div>
+
+            {/* 4. Store Settings */}
+            <div className="mt-12">
+                <SettingsForm initialDays={storeSettings?.pickup_days || [0, 1, 2, 3, 4, 5, 6]} />
             </div>
         </div>
     )
