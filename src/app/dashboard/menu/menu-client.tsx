@@ -1,49 +1,11 @@
-"use client"
+import { createClient } from "@/utils/supabase/client"
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table"
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Switch } from "@/components/ui/switch"
-import { formatCurrency } from "@/lib/utils"
-import { Plus, Pencil } from "lucide-react"
-import { upsertProduct, toggleProductStatus } from "./actions"
-import { toast } from "sonner"
-
-type Product = {
-    id: string
-    name: string
-    description: string | null
-    price: number
-    image_url: string | null
-    is_active: boolean
-}
+// ... imports remain the same ...
 
 export function MenuManager({ initialProducts }: { initialProducts: Product[] }) {
     const [isDialogOpen, setIsDialogOpen] = useState(false)
     const [editingProduct, setEditingProduct] = useState<Product | null>(null)
     const [isLoading, setIsLoading] = useState(false)
-
-    // Form States
-    // In a real app, use react-hook-form. Here keeping it simple with native form binding.
 
     const handleEdit = (product: Product) => {
         setEditingProduct(product)
@@ -58,14 +20,39 @@ export function MenuManager({ initialProducts }: { initialProducts: Product[] })
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         setIsLoading(true)
-        const formData = new FormData(e.currentTarget)
-
-        // Append ID if editing
-        if (editingProduct) {
-            formData.append('id', editingProduct.id)
-        }
 
         try {
+            const formData = new FormData(e.currentTarget)
+            const file = (e.currentTarget.elements.namedItem('image_file') as HTMLInputElement)?.files?.[0]
+
+            // Handle File Upload
+            if (file) {
+                const supabase = createClient()
+                const fileExt = file.name.split('.').pop()
+                const fileName = `${Date.now()}.${fileExt}`
+                const { error: uploadError } = await supabase.storage.from('products').upload(fileName, file)
+
+                if (uploadError) throw new Error('Upload failed: ' + uploadError.message)
+
+                const { data: { publicUrl } } = supabase.storage.from('products').getPublicUrl(fileName)
+                formData.set('image_url', publicUrl)
+            }
+
+            // Append ID if editing
+            if (editingProduct) {
+                formData.append('id', editingProduct.id)
+            }
+
+            // If editing and no new file, image_url is already in input or we need to preserve it?
+            // The form has a hidden input or text input for manual override? 
+            // Let's rely on the fact that if image_url is empty string, we might not want to overwrite it if we didn't upload?
+            // Actually, best practice: 
+            // If user uploads file -> use that. 
+            // If editing -> preserve old URL unless changed.
+            // We can keep a hidden input with the old URL.
+
+            // Using logic: If formData has 'image_url' (from text input or set by us above), it uses it.
+
             await upsertProduct(formData)
             toast.success(editingProduct ? "Product updated" : "Product created")
             setIsDialogOpen(false)
@@ -152,13 +139,31 @@ export function MenuManager({ initialProducts }: { initialProducts: Product[] })
                             <Textarea id="description" name="description" defaultValue={editingProduct?.description || ''} />
                         </div>
                         <div className="grid gap-2">
-                            <Label htmlFor="price">Price (in cents)</Label>
-                            <Input id="price" name="price" type="number" required defaultValue={editingProduct?.price} placeholder="e.g. 500 for $5.00" />
+                            {/* Price formatted in Dollars */}
+                            <Label htmlFor="price">Price ($)</Label>
+                            <Input
+                                id="price"
+                                name="price"
+                                type="number"
+                                step="0.01"
+                                required
+                                defaultValue={editingProduct ? (editingProduct.price / 100).toFixed(2) : ''}
+                                placeholder="5.50"
+                                className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                            />
                         </div>
+
                         <div className="grid gap-2">
-                            <Label htmlFor="image_url">Image URL</Label>
+                            <Label htmlFor="image_file">Product Image</Label>
+                            <Input id="image_file" name="image_file" type="file" accept="image/*" />
+                            <p className="text-xs text-muted-foreground">Or verify existing URL below:</p>
+                        </div>
+
+                        <div className="grid gap-2">
+                            <Label htmlFor="image_url">Image URL (Auto-filled on upload)</Label>
                             <Input id="image_url" name="image_url" defaultValue={editingProduct?.image_url || ''} placeholder="https://..." />
                         </div>
+
                         <div className="flex items-center gap-2">
                             <Switch id="is_active" name="is_active" defaultChecked={editingProduct?.is_active ?? true} />
                             <Label htmlFor="is_active">Active (Visible)</Label>

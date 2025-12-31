@@ -9,7 +9,7 @@ export async function upsertProduct(formData: FormData) {
     const id = formData.get('id') as string
     const name = formData.get('name') as string
     const description = formData.get('description') as string
-    const price = parseInt(formData.get('price') as string) // stored in cents
+    const price = Math.round(parseFloat(formData.get('price') as string) * 100) // Convert dollars to cents
     const image_url = formData.get('image_url') as string
     const is_active = formData.get('is_active') === 'on'
 
