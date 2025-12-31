@@ -28,7 +28,7 @@ export function CheckoutForm({ clientSecret, pickupDate }: { clientSecret: strin
         const { error } = await stripe.confirmPayment({
             elements,
             confirmParams: {
-                return_url: `${window.location.origin}/profile`, // Redirect to profile upon completion
+                return_url: `${window.location.origin}/checkout/success`,
             },
         })
 
