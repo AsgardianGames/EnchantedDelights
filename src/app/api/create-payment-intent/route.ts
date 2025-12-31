@@ -81,7 +81,7 @@ export async function POST(req: Request) {
     }
 
     const paymentIntent = await stripe.paymentIntents.create({
-        amount: total,
+        amount: Math.round(total * 100), // Convert to cents
         currency: 'usd',
         metadata: {
             orderId: orderId || 'demo_order',

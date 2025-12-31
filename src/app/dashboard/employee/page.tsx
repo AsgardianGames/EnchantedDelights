@@ -26,6 +26,7 @@ export default async function KitchenDashboard() {
             id,
             status,
             pickup_date,
+            profiles (full_name),
             order_items (
                 quantity,
                 products (name)
