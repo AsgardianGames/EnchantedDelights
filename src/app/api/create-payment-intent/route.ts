@@ -43,6 +43,10 @@ export async function POST(req: Request) {
         }
     }
 
+    // Apply Tax (8.2%)
+    const tax = total * 0.082
+    total = Math.round((total + tax) * 100) / 100 // Round to 2 decimals
+
     if (total < 50) { // Limit min order
         return new NextResponse("Minimum order amount is $0.50", { status: 400 })
     }

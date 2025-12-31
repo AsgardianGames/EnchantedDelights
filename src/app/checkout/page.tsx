@@ -94,9 +94,19 @@ export default function CheckoutPage() {
                                 </div>
                             ))}
                         </div>
-                        <div className="border-t pt-4 flex justify-between font-bold text-lg">
-                            <span>Total</span>
-                            <span>{formatCurrency(total)}</span>
+                        <div className="border-t pt-4 space-y-2">
+                            <div className="flex justify-between text-sm">
+                                <span>Subtotal</span>
+                                <span>{formatCurrency(total / 1.082)}</span>
+                            </div>
+                            <div className="flex justify-between text-sm">
+                                <span>Tax (8.2%)</span>
+                                <span>{formatCurrency(total - (total / 1.082))}</span>
+                            </div>
+                            <div className="flex justify-between font-bold text-lg pt-2 border-t">
+                                <span>Total</span>
+                                <span>{formatCurrency(total)}</span>
+                            </div>
                         </div>
                     </div>
 
