@@ -60,31 +60,40 @@ export async function POST(req: Request) {
     let orderId = null
 
     if (user) {
-        const { data: order, error } = await supabase.from('orders').insert({
+        const { data: order, error: orderError } = await supabase.from('orders').insert({
             customer_id: user.id,
             total_amount: total,
             status: 'pending',
-            pickup_date: pickupDate || new Date().toISOString(), // Fallback
+            pickup_date: pickupDate || new Date().toISOString(),
         }).select().single()
+
+        if (orderError) {
+            console.error("Failed to create pending order:", orderError)
+            return new NextResponse("Failed to initiate order", { status: 500 })
+        }
 
         if (order) {
             orderId = order.id
-            // Insert items
             const orderItemsByType = items.map((item: any) => ({
                 order_id: order.id,
-                product_id: item.id, // Warning: if mock ID, this will fail FK.
+                product_id: item.id,
                 quantity: item.quantity
             }))
-            // Only insert if valid UUIDs. Mock IDs '1', '2' will fail UUID check.
-            // If we are using Mock Data, we skip DB insert and just do Payment Intent for demo.
+
+            const { error: itemsError } = await supabase.from('order_items').insert(orderItemsByType)
+            if (itemsError) {
+                console.error("Failed to add items:", itemsError)
+                await supabase.from('orders').delete().eq('id', order.id) // Rollback
+                return new NextResponse("Failed to save order items. Are products valid?", { status: 500 })
+            }
         }
     }
 
     const paymentIntent = await stripe.paymentIntents.create({
-        amount: Math.round(total * 100), // Convert to cents
+        amount: Math.round(total * 100),
         currency: 'usd',
         metadata: {
-            orderId: orderId || 'demo_order',
+            orderId: orderId || 'guest_order',
             userId: user?.id || 'guest',
         },
         automatic_payment_methods: {
